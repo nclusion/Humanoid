@@ -1,5 +1,4 @@
 const cheerio = require("cheerio");
-const safeEval = require("safe-eval");
 
 
 class Solver {
@@ -29,13 +28,13 @@ class Solver {
 	static _operateOnResult(operator, expr, result) {
 		switch(operator) {
 		case "+=":
-			return result += safeEval(expr);
+			return result += eval(expr);
 		case "*=":
-			return result *= safeEval(expr);
+			return result *= eval(expr);
 		case "-=":
-			return result -= safeEval(expr);
+			return result -= eval(expr);
 		case "/=":
-			return result /= safeEval(expr);
+			return result /= eval(expr);
 		default:
 			throw Error("Could not match operator. Cannot solve JS challenge");
 		}
@@ -81,7 +80,7 @@ class Solver {
 			// Parse only the actual math challenge parts from the script tag and assign them
 			let challengeMatches = this._matchChallengeFromScript(script);
 			let [challengeInit, challengeMutations] = this._parseChallenge(challengeMatches);
-			let answer = this._buildAnswer(challengeMutations, safeEval(challengeInit));
+			let answer = this._buildAnswer(challengeMutations, eval(challengeInit));
 			answer = parseFloat(answer.toFixed(10)) + host.length;
 			
 			return {vc: vc, pass: pass, answer: answer, origin: origin};

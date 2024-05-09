@@ -1,13 +1,14 @@
 const fs = require("fs");
-const rpn = require("request-promise-native");
 const URL = require("url-parse");
 const Response = require("./response");
 const brotli = require('iltorb');
-
+const axios = require('axios');
+const wrapper = require('axios-cookiejar-support');
+const Cookie = require('tough-cookie');
 
 class HumanoidReqHandler {
 	constructor() {
-		this.cookieJar = rpn.jar()
+		this.cookieJar = new Cookie.CookieJar();
 		this._userAgentList = fs.readFileSync(__dirname + "/ua.text").toString().split("\n");
 		this.UA = this._getRandomUA(); // Set UserAgent
 		this.config = {  // Set default config values
@@ -17,6 +18,7 @@ class HumanoidReqHandler {
 			gzip: true,
 			encoding: null
 		}
+		this.client = wrapper.wrapper(axios.create({ jar: this.cookieJar }));
 	}
 	
 	_getRandomUA() {
@@ -82,15 +84,19 @@ class HumanoidReqHandler {
 		currConfig = data !== undefined ? this._getConfForMethod(method, currConfig, data, dataType) : currConfig;
 		
 		// Send the request
-		let res = await rpn(url, currConfig);
+		//let res = await rpn(url, currConfig);
+		let res = await this.client.request({...currConfig, url})
 		// Decompress Brotli content-type if returned (Unsupported natively by `request`)
 		res = res.headers["content-encoding"] === "br" ? await this._decompressBrotli(res) : res;
 		
+		/*
 		if (dataType === "json") {
 			res.body = JSON.stringify(res.body);
 		} else {
 			res.body = res.body.toString();
 		}
+		*/
+		res.body = JSON.stringify(res.data)
 		
 		if (this.isCaptchaInResponse(res.body)) {
 			throw Error("CAPTCHA page encountered. Cannot perform bypass.")

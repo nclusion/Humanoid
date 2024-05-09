@@ -1,7 +1,7 @@
-const request = require("request-promise-native");
+//const request = require("request-promise-native");
 const Solver = require("./src/solver");
 const HumanoidReqHandler = require("./src/humanoidReqHandler");
-
+const Cookie = require('tough-cookie');
 
 class Humanoid extends HumanoidReqHandler {
 	constructor(autoBypass=true, maxRetries=3) {
@@ -24,7 +24,7 @@ class Humanoid extends HumanoidReqHandler {
 	}
 	
 	clearCookies() {
-		super.cookieJar = request.jar();
+		super.cookieJar = new Cookie.CookieJar();
 	}
 	
 	_buildAnswerObject(values) {
