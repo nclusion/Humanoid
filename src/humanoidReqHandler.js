@@ -96,7 +96,7 @@ class HumanoidReqHandler {
 			res.body = res.body.toString();
 		}
 		*/
-		res.body = JSON.stringify(res.data)
+		res.body = res.data
 		
 		if (this.isCaptchaInResponse(res.body)) {
 			throw Error("CAPTCHA page encountered. Cannot perform bypass.")
